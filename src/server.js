@@ -92,7 +92,7 @@ export default class ProxyServer extends EventEmitter {
 
     handleClient(client) {
         const addr = client.socket.remoteAddress;
-        silly(`Connection from ${addr}`);
+        log(`Connection from ${addr}`);
 
         // hijack the socket for proxying and exit early if we have an alive target
         if (this.checker.currentState.active) {
@@ -103,6 +103,8 @@ export default class ProxyServer extends EventEmitter {
                     this.checker.target.port,
                     this.checker.target.host
                 );
+
+                log(targetConnection);
                 socket = client.socket;
                 client.socket = createNoopStream();
                 socket.unpipe(); // stop everyone else from listening to it
@@ -141,6 +143,7 @@ export default class ProxyServer extends EventEmitter {
     }
 
     handleLogin(client) {
+        
         this.setState(STATES.starting);
         log(
             `Player ${client.username} (${client.uuid}) connected, starting server`
