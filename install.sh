@@ -4,12 +4,6 @@ CUR_PATH=`pwd`
 NODE=$(realpath $(which node))
 USER=`whoami`
 
-[[ -z "$CUR_PATH" ]] && { echo -e "\e[31mCouldn't get current path\[0m"; exit 1; }
-[[ -z "$NODE" ]] && { echo -e "\e[31mCouldn't get path to node\[0m"; exit 1; }
-[[ -z "$USER" ]] && { echo -e "\e[31mCouldn't get current user\[0m"; exit 1; }
-[[ -x `which systemctl` ]] || { echo -e "\e[31mThis install script only works if systemd is installed\e[0m"; exit 1; }
-[[ -x `which npm` ]] || { echo -e "\e[31mNode and NPM are required\e[0m"; exit 1; }
-
 # install dependencies
 echo "Installing dependencies"
 npm install
