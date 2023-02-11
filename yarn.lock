@@ -2526,7 +2526,7 @@
   "resolved" "https://registry.npmjs.org/minecraft-folder-path/-/minecraft-folder-path-1.2.0.tgz"
   "version" "1.2.0"
 
-"minecraft-protocol@^1.40.2":
+"minecraft-protocol@^1.38.0":
   "integrity" "sha512-GnCpfPjXE07Nq+G78m7o3TkZe9aVfJCRZLGV3YZqwbthWXmynYkQhnezjSgXFkLdjhO+D20K+SqPCEFUJgctUg=="
   "resolved" "https://registry.npmjs.org/minecraft-protocol/-/minecraft-protocol-1.40.2.tgz"
   "version" "1.40.2"
