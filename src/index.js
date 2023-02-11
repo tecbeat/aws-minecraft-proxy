@@ -51,10 +51,10 @@ server.on("stop", () => {
 
 export function getHostIP() {
     var cluster = config.target.cluster;
-    const taskArnCommand = `aws ecs list-tasks --cluster ${cluster} --query 'taskArns[0]' --output text`;
+    const taskArnCommand = `aws ecs list-tasks --region eu-central-1 --cluster ${cluster} --query 'taskArns[0]' --output text`;
     const taskArn = executeCommand(taskArnCommand);
     if (taskArn == "None") return "localhost";
-    const ipAddress = `aws ecs describe-tasks --cluster ${cluster} --tasks ${taskArn} --query 'tasks[0].attachments[0].details[4].value' --output text`
+    const ipAddress = `aws ecs describe-tasks --region eu-central-1 --cluster ${cluster} --tasks ${taskArn} --query 'tasks[0].attachments[0].details[4].value' --output text`
     if (ipAddress == "None") return "localhost";
     return ipAddress;
 }

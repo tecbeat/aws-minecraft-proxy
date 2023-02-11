@@ -23,8 +23,8 @@
             "port": 25565
         },
         "commands": {
-            "start": "aws ecs update-service --cluster <cluster-name> --service <service-name> --desired-count 1 --region eu-central-1",
-            "shutdown": "aws ecs update-service --cluster <cluster-name> --service <service-name> --desired-count 0 --region eu-central-1"
+            "start": "aws ecs update-service --region eu-central-1 --cluster <cluster-name> --service <service-name> --desired-count 1",
+            "shutdown": "aws ecs update-service --region eu-central-1 --cluster <cluster-name> --service <service-name> --desired-count 0"
         }
     }
 }
