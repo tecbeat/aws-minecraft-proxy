@@ -1,5 +1,6 @@
 import mc from "minecraft-protocol";
 import { silly, log, error } from "./debug.js";
+import { getHostIP } from "./index.js";
 import { timeoutPromise } from "./utils.js";
 
 const TIMEOUT_ERR = "TIMEOUT";
@@ -8,11 +9,10 @@ const CHECK_TIMEOUT = 5000;
 
 export default class ServerChecker {
     constructor(
-        /**@type {string}*/ targetHost,
         /**@type {number}*/ targetPort
     ) {
         this.target = {
-            host: targetHost,
+            host: "localhost",
             port: targetPort,
         };
         this.currentState = {
@@ -60,6 +60,7 @@ export default class ServerChecker {
     }
 
     async getTargetData() {
+        this.target.host = getHostIP();
         return new Promise((res, rej) => {
             mc.ping(
                 { host: this.target.host, port: this.target.port },

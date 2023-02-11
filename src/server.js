@@ -19,19 +19,18 @@ function createNoopStream() {
         write(chunk, encoding, next) {
             next();
         },
-        read() {},
+        read() { },
     });
 }
 
 export default class ProxyServer extends EventEmitter {
     constructor(
         /**@type {number}*/ listenPort,
-        /**@type {string}*/ targetHost,
         /**@type {number}*/ targetPort,
         /**@type {mc.ServerOptions}*/ mcProtocolArgs = {}
     ) {
         super();
-        this.checker = new Checker(targetHost, targetPort);
+        this.checker = new Checker(targetPort);
         this.currentState = {
             state: STATES.unknown,
             time: Date.now(),
@@ -217,7 +216,7 @@ export default class ProxyServer extends EventEmitter {
         if (this.currentState.state === STATES.active) {
             const players =
                 this.checker.currentState.data &&
-                this.checker.currentState.data.players
+                    this.checker.currentState.data.players
                     ? this.checker.currentState.data.players.online || 0
                     : 0;
 

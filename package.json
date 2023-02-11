@@ -19,7 +19,7 @@
     },
     "minecraft-aws": {
         "target": {
-            "host": "localhost",
+            "cluster": "<cluster-name>",
             "port": 25565
         },
         "commands": {
