@@ -19,12 +19,12 @@
     },
     "minecraft-aws": {
         "target": {
-            "cluster": "<cluster-name>",
-            "port": 25565
+            "cluster": "TecGame-ClusterEB0386A7-7DxOr5qx4uZZ",
+            "port": 25564
         },
         "commands": {
-            "start": "aws ecs update-service --region eu-central-1 --cluster <cluster-name> --service <service-name> --desired-count 1",
-            "shutdown": "aws ecs update-service --region eu-central-1 --cluster <cluster-name> --service <service-name> --desired-count 0"
+            "start": "aws ecs update-service --region eu-central-1 --cluster TecGame-ClusterEB0386A7-7DxOr5qx4uZZ --service TecGame-FargateServiceAC2B3B85-JyxejZTh71WW --desired-count 1",
+            "shutdown": "aws ecs update-service --region eu-central-1 --cluster TecGame-ClusterEB0386A7-7DxOr5qx4uZZ --service TecGame-FargateServiceAC2B3B85-JyxejZTh71WW --desired-count 0"
         }
     }
 }

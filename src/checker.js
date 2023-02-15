@@ -1,7 +1,10 @@
 import mc from "minecraft-protocol";
 import { silly, log, error } from "./debug.js";
-import { getHostIP } from "./index.js";
+import { exec } from "child_process";
 import { timeoutPromise } from "./utils.js";
+import path from "path";
+import dirname from "./dirname.cjs";
+const { __dirname } = dirname;
 
 const TIMEOUT_ERR = "TIMEOUT";
 const CHECK_INTERVAL = 5000;
@@ -9,10 +12,12 @@ const CHECK_TIMEOUT = 5000;
 
 export default class ServerChecker {
     constructor(
+        /**@type {string}*/ targetCluster,
         /**@type {number}*/ targetPort
     ) {
         this.target = {
-            host: "localhost",
+            host: undefined,
+            cluster: targetCluster,
             port: targetPort,
         };
         this.currentState = {
@@ -32,12 +37,15 @@ export default class ServerChecker {
     }
 
     checkTarget() {
+        silly(this.currentState);
+        silly(this.target);
         clearTimeout(this._checkTimeout);
         const state = {
             active: false,
             data: {},
             time: 0,
         };
+        // updateHost();
         Promise.race([
             this.getTargetData(),
             timeoutPromise(CHECK_TIMEOUT, TIMEOUT_ERR),
@@ -55,12 +63,24 @@ export default class ServerChecker {
             .then(() => {
                 state.time = Date.now();
                 this.currentState = state;
-                this._checkTimeout = setTimeout(this.checkTarget, 5000);
+                this._checkTimeout = setTimeout(this.checkTarget, 10000);
             });
     }
 
-    async getTargetData() {
-        this.target.host = getHostIP();
+    getTargetData() {
+        this.getTaskArn()
+            .then((taskArn) => {
+                this.getHostIP(taskArn)
+                    .then((ip) => {
+                        this.target.host = ip;
+                    })
+                    .catch((err) => {
+                        silly(err);
+                    });
+            })
+            .catch((err) => {
+                silly(err);
+            });
         return new Promise((res, rej) => {
             mc.ping(
                 { host: this.target.host, port: this.target.port },
@@ -69,6 +89,39 @@ export default class ServerChecker {
                         return rej(err);
                     }
                     res(data);
+                }
+            );
+        });
+    }
+
+    getTaskArn() {
+        return new Promise((res, rej) => {
+            exec(
+                `aws ecs list-tasks --region eu-central-1 --cluster ${this.target.cluster} --query taskArns[0] --output text`,
+                { cwd: path.join(__dirname, "..") },
+                (err, stdout, stderr) => {
+                    if (err) {
+                        return rej(`Command failed (${err.name} ${err.message}):\n${stderr.toString()}`)
+                    }
+                    if (stdout.toString().includes("None")) {
+                        return rej("There is no Task available!")
+                    }
+                    res(stdout.toString().trim());
+                }
+            );
+        });
+    }
+
+    getHostIP(taskArn) {
+        return new Promise((res, rej) => {
+            exec(
+                `aws ecs describe-tasks --region eu-central-1 --cluster ${this.target.cluster} --tasks ${taskArn} --query tasks[0].attachments[0].details[4].value --output text`,
+                { cwd: path.join(__dirname, "..") },
+                (err, stdout, stderr) => {
+                    if (err) {
+                        return rej(`Command failed (${err.name} ${err.message}):\n${stderr.toString()}`)
+                    }
+                    res(stdout.toString().trim());
                 }
             );
         });

@@ -12,7 +12,7 @@ const STATES = {
     starting: 3,
     stopping: 4,
 };
-const SHUTDOWN_TIMEOUT = 5 * 60 * 1000;
+const SHUTDOWN_TIMEOUT = 7 * 60 * 1000;
 
 function createNoopStream() {
     return new stream.Duplex({
@@ -26,11 +26,12 @@ function createNoopStream() {
 export default class ProxyServer extends EventEmitter {
     constructor(
         /**@type {number}*/ listenPort,
+        /**@type {string}*/ targetCluster,
         /**@type {number}*/ targetPort,
         /**@type {mc.ServerOptions}*/ mcProtocolArgs = {}
     ) {
         super();
-        this.checker = new Checker(targetPort);
+        this.checker = new Checker(targetCluster, targetPort);
         this.currentState = {
             state: STATES.unknown,
             time: Date.now(),

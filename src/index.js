@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import fs from "fs";
 import path from "path";
-import childProcess from "child_process";
-import { silly, log, error } from "./debug.js";
+import { exec } from "child_process";
+import { log, error } from "./debug.js";
+import { stdout, stderr } from "process";
 import Server from "./server.js";
 import dirname from "./dirname.cjs";
-import { stdout } from "process";
 const { __dirname } = dirname;
 
 // make sure configuration is specified in package.json
@@ -40,7 +40,7 @@ function executeAction(name) {
     executeCommand(command);
 }
 
-const server = new Server(25565, config.target.port);
+const server = new Server(25565, config.target.cluster, config.target.port);
 server.on("start", () => {
     executeAction("start");
 });
@@ -49,19 +49,9 @@ server.on("stop", () => {
 });
 
 
-export function getHostIP() {
-    var cluster = config.target.cluster;
-    const taskArnCommand = `aws ecs list-tasks --region eu-central-1 --cluster ${cluster} --query 'taskArns[0]' --output text`;
-    const taskArn = executeCommand(taskArnCommand);
-    if (taskArn == "None") return "localhost";
-    const ipAddress = `aws ecs describe-tasks --region eu-central-1 --cluster ${cluster} --tasks ${taskArn} --query 'tasks[0].attachments[0].details[4].value' --output text`
-    if (ipAddress == "None") return "localhost";
-    return ipAddress;
-}
-
 function executeCommand(command) {
     log(`Executing command for cluster: ${command}`);
-    childProcess.exec(
+    exec(
         command,
         { cwd: path.join(__dirname, "..") },
         (err, stdout, stderr) => {
@@ -73,7 +63,7 @@ function executeCommand(command) {
                 return;
             }
             log(`Command finished:\n${stdout.toString()}`);
-            return stdout;
+            return stdout.toString();
         }
     );
 }
